@@ -1,19 +1,17 @@
 #pragma once
 #include <iostream>
 #include <ostream>
+#include <cstdint>
 #include <vector>
-struct Pixel {
-  uint8_t red = 255;
-  uint8_t green = 255;
-  uint8_t blue = 255;
-};
+#include "vec3.h"
 
+using Pixel = Vec3;
 class Canvas {
 
 private:
   std::vector<Pixel> pixels;
   std::ostream &output = std::cout;
-  int maxColour = 255;
+  int max_colour = 255;
   int width;
   int height;
 
@@ -23,8 +21,12 @@ private:
 
 public:
   Canvas(int width, int height);
-
+  int toByte(double t) const;
+  void setPixelByScreen(Pixel pixel, int x, int y);
   void setPixelByCartesian(Pixel pixel, int x, int y);
   void setPixelByIndex(Pixel pixel, int index);
   void createImage();
+  int getWidth() { return width; }
+  int getHeight() { return height; }
 };
+

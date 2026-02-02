@@ -7,12 +7,21 @@ Canvas::Canvas(int width, int height) {
   this->height = height;
 }
 void Canvas::writeHeader() {
-  output << "P3\n" << width << " " << height << '\n' << maxColour << '\n';
+  output << "P3\n" << width << " " << height << '\n' << max_colour << '\n';
 }
 
 void Canvas::writePixel(Pixel pixel) {
-  output << int(pixel.red) << ' ' << int(pixel.green) << ' ' << int(pixel.blue)
+  output << toByte(pixel.x) << ' ' << toByte(pixel.y) << ' ' << toByte(pixel.z)
          << '\n';
+}
+
+int Canvas::toByte(double t) const {
+  if (t < 0) {
+  std::clog << "error!" << '\n';
+  t = 0;
+  }
+  if (t > 1) t = 1;
+  return t * (max_colour + 0.999);
 }
 
 void Canvas::setPixelByCartesian(Pixel pixel, int x, int y) {
@@ -23,8 +32,14 @@ void Canvas::setPixelByCartesian(Pixel pixel, int x, int y) {
   setPixelByIndex(pixel, y * width + x);
 }
 
+void Canvas::setPixelByScreen(Pixel pixel, int x, int y) {
+  setPixelByIndex(pixel, y*width + x);
+}
+
 void Canvas::setPixelByIndex(Pixel pixel, int index) {
   if (index < 0 || index >= width * height) {
+    std::cout << "error: index invalid" << '\n';
+    exit(1);
     return;
   }
 
@@ -36,4 +51,5 @@ void Canvas::createImage() {
   for (Pixel pixel : pixels) {
     writePixel(pixel);
   }
+  output.flush();
 }
