@@ -1,7 +1,6 @@
 #include "scene.h"
 #include "camera.h"
 #include "sphere.h"
-#include "renderer.h"
 #include "ray_tracing_engine.h"
 #include "canvas.h"
 #include <memory>
