@@ -17,10 +17,12 @@ void Canvas::writePixel(Pixel pixel) {
 
 int Canvas::toByte(double t) const {
   if (t < 0) {
-  std::clog << "error!" << '\n';
-  t = 0;
+    std::clog << "error!" << '\n';
+    t = 0;
   }
-  if (t > 1) t = 1;
+  if (t > 1) {
+    t = 1;
+  }
   return t * (max_colour + 0.999);
 }
 
@@ -33,7 +35,7 @@ void Canvas::setPixelByCartesian(Pixel pixel, int x, int y) {
 }
 
 void Canvas::setPixelByScreen(Pixel pixel, int x, int y) {
-  setPixelByIndex(pixel, y*width + x);
+  setPixelByIndex(pixel, y * width + x);
 }
 
 void Canvas::setPixelByIndex(Pixel pixel, int index) {

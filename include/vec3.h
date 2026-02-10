@@ -45,6 +45,10 @@ public:
 
   friend Vec3 operator*(const double t, const Vec3 &a) { return a * t; }
 
+  friend Vec3 operator*(const Vec3 &a, const Vec3 &t) {
+    return Vec3{t.x * a.x, t.y * a.y, t.z * a.z};
+  }
+
   friend Vec3 operator/(const Vec3 &a, const double t) { return a * (1 / t); }
 
   friend bool operator==(const Vec3 &a, const Vec3 &b) {
