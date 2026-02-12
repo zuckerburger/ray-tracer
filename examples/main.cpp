@@ -1,5 +1,6 @@
 #include "camera.h"
 #include "canvas.h"
+#include "material.h"
 #include "msaa.h"
 #include "ray_tracing_engine.h"
 #include "scene.h"
@@ -12,12 +13,22 @@ int main(int argc, char **argv) {
   Scene scene;
   Vec3 sphere_origin = Vec3(0, 0, 2);
   float radius = 0.5;
+  Vec3 red = Vec3(0.9, 0.2, 0.2);
+  float smoothness = 0;
+
   auto sphere = std::make_shared<Sphere>(radius, sphere_origin);
-  sphere->setMaterial(Vec3(0.3, 0.4, 0.5));
+  Material sphereMaterial = Material{red, smoothness};
+  sphere->setMaterial(sphereMaterial);
+
   scene.addPrimitive(sphere);
 
   auto sphere2 = std::make_shared<Sphere>(radius, Vec3(1, 0, 1));
+  sphere2->setMaterial(sphereMaterial);
+
   auto sphere3 = std::make_shared<Sphere>(radius, Vec3(-1, 0, 1));
+  sphereMaterial.emission_strength = 10;
+  sphere3->setMaterial(sphereMaterial);
+
   scene.addPrimitive(sphere2);
   scene.addPrimitive(sphere3);
 

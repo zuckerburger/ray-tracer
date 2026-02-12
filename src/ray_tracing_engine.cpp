@@ -60,16 +60,16 @@ Vec3 RayTracingEngine::calculateColour(Ray &ray, Scene &scene) {
     Ray shadow_ray = Ray(record.point, light_direction);
     HitRecord shadow = scene.traceRay(shadow_ray).record;
     double epsilon = 1.e-6;
-    double brightness = 0.1;
+    double brightness = 0.25;
 
     // Epsilon accounts for floating point error
     if (shadow.hit == false or shadow.t < epsilon) {
-      // Use angle between light and surface normal to calculate brightness
+      // Use angle between light and surface normal
       brightness = std::max(0.0, dotProduct(record.normal, light_direction));
     }
 
-    // Brightness cubed for gamma correction
-    Vec3 new_color = record.colour * brightness +
+    // Use brightness cubed for gamma correction
+    Vec3 new_color = record.material.colour * brightness +
                      light_colour * brightness * brightness * brightness;
 
     return new_color;

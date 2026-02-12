@@ -1,6 +1,9 @@
 #include "triangle.h"
+#include "primitive.h"
 #include "ray.h"
-void Triangle::setMaterial(const Vec3 &colour) { this->colour = colour; }
+void Triangle::setMaterial(const Material &material) {
+  this->material = material;
+}
 
 HitRecord Triangle::raycast(const Ray &ray) {
   // Moller–Trumbore intersection algorithm
@@ -40,5 +43,5 @@ HitRecord Triangle::raycast(const Ray &ray) {
   }
 
   Vec3 point = ray.parametric(t);
-  return {true, t, point, normal, colour};
+  return HitRecord{true, t, point, normal, this->material};
 }

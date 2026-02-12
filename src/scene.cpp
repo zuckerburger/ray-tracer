@@ -10,7 +10,7 @@ RayRecord Scene::traceRay(const Ray &ray) {
   std::shared_ptr<Primitive> object;
 
   // Check if ray hit any object
-  double epsilon = 0;
+  double epsilon = 1e-8;
   for (auto &obj : primitives) {
     HitRecord current_record = obj->raycast(ray);
 

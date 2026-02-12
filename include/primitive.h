@@ -1,4 +1,5 @@
 #pragma once
+#include "material.h"
 #include "vec3.h"
 
 class Ray;
@@ -7,11 +8,12 @@ struct HitRecord {
   double t{};
   Vec3 point{};
   Vec3 normal{};
-  Vec3 colour{};
+  Material material{};
 };
+
 class Primitive {
 public:
   Primitive(){};
   virtual HitRecord raycast(const Ray &ray) = 0;
-  virtual void setMaterial(const Vec3 &colour) = 0;
+  virtual void setMaterial(const Material &material) = 0;
 };
