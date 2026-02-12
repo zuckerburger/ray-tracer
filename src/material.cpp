@@ -3,21 +3,10 @@
 #include "ray.h"
 #include "vec3.h"
 
-void Material::setColour(Vec3 colour) { this->colour = colour; }
-void Material::setSmoothness(float smoothness) {
-  this->smoothness = smoothness;
-}
-
-void Material::setEmission(float emission_strength, Vec3 emission_colour) {
-  this->emission_colour = emission_colour;
-  this->emission_strength = emission_strength;
-}
-
 Vec3 Material::calculateReflection(const Ray &incoming_ray,
                                    const Vec3 &surface_normal,
                                    Vec3 &incoming_light, Vec3 &light_colour,
                                    uint32_t seed) {
-  double epsilon = 1e-8;
   Vec3 outgoing_ray_direction{};
   // Randomly decide between specular or diffuse reflection from smoothness
   double specular_probability = random_double(0, 1, seed);
