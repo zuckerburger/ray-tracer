@@ -11,11 +11,18 @@ public:
       : colour{colour}, smoothness{smoothness} {}
 
   Vec3 calculateReflection(const Ray &incoming_ray, const Vec3 &surface_normal,
-                           Vec3 &light_intensity, uint32_t seed);
+                           Vec3 &incoming_light, Vec3 &light_colour,
+                           uint32_t seed);
   void setSmoothness(float smoothness);
   void setColour(Vec3 colour);
+  void setEmission(float emission_strength,
+                   Vec3 emission_colour = Vec3{.9, .9, .9});
 
 private:
-  Vec3 colour;
   float smoothness;
+  Vec3 colour;
+  Vec3 specular_colour{.9, .9, .9};
+
+  float emission_strength;
+  Vec3 emission_colour;
 };
