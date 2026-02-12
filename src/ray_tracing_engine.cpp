@@ -4,6 +4,7 @@
 #include "msaa.h"
 #include "ray.h"
 #include "scene.h"
+#include <cstdint>
 
 void RayTracingEngine::render(Camera &camera, Scene &scene, Canvas &canvas) {
   // Loop over every pixel in the image
@@ -19,28 +20,25 @@ void RayTracingEngine::render(Camera &camera, Scene &scene, Canvas &canvas) {
       }
 
       // Pixel is an edge if samples hit different objects
-      auto object = scene.traceRay(rays[0]).object;
-      bool isEdge = false;
-      for (auto i = 1; i < rays.size(); i++) {
-        auto newObj = scene.traceRay(rays[i]).object;
-        if (newObj != object) {
-          isEdge = true;
-          break;
-        }
-      }
+      // auto object = scene.traceRay(rays[0]).object;
+      // bool isEdge = false;
+      // for (auto i = 1; i < rays.size(); i++) {
+      //   auto newObj = scene.traceRay(rays[i]).object;
+      //   if (newObj != object) {
+      //     isEdge = true;
+      //     break;
+      //   }
+      // }
 
       Vec3 colour{};
-
+      uint32_t seed = j * camera.getImageHeight() + i;
       // For edge pixels, take the average of each samples colour
-      if (isEdge) {
-        Vec3 sum{};
-        for (auto ray : rays) {
-          sum = calculateColour(ray, scene) + sum;
-        }
-        colour = sum / rays.size();
-      } else {
-        colour = calculateColour(rays[0], scene);
+      Vec3 sum{};
+      for (auto ray : rays) {
+        sum = calculateColour(ray, scene, seed) + sum;
+        seed++;
       }
+      colour = sum / rays.size();
       canvas.setPixelByScreen(colour, i, j);
     }
   }
@@ -50,30 +48,35 @@ void RayTracingEngine::addMultiSampling(int samplesPerPixel) {
   msaaSamples = setMsaa(samplesPerPixel);
 }
 
-Vec3 RayTracingEngine::calculateColour(Ray &ray, Scene &scene) {
+Vec3 RayTracingEngine::calculateColour(Ray &ray, Scene &scene, uint32_t seed) {
 
-  RayRecord ray_record = scene.traceRay(ray);
-  HitRecord record = ray_record.record;
+  double epsilon = 1e-6;
 
-  if (record.hit) {
-    Vec3 light_direction = normalise(light_origin - record.point);
-    Ray shadow_ray = Ray(record.point, light_direction);
-    HitRecord shadow = scene.traceRay(shadow_ray).record;
-    double epsilon = 1.e-6;
-    double brightness = 0.25;
+  Vec3 incoming_light{};
+  Vec3 light_colour{1, 1, 1};
+  for (int i = 0; i < max_light_bounces; i++) {
+    RayRecord ray_record = scene.traceRay(ray);
+    HitRecord record = ray_record.record;
+    if (record.hit) {
+      Material material = record.material;
+      // Use material of surface to modify light and colour
+      Vec3 reflection = material.calculateReflection(
+          ray, record.normal, incoming_light, light_colour, seed);
 
-    // Epsilon accounts for floating point error
-    if (shadow.hit == false or shadow.t < epsilon) {
-      // Use angle between light and surface normal
-      brightness = std::max(0.0, dotProduct(record.normal, light_direction));
+      if (reflection.length() <= epsilon) {
+        break;
+      }
+
+      // Offset to avoid self intersection with new ray
+      Vec3 offset = epsilon * record.normal;
+      ray = Ray(record.point + offset, reflection);
+
+    } else {
+      light_colour = light_colour * background;
+      incoming_light = incoming_light + background_intensity * light_colour;
+      break;
     }
-
-    // Use brightness cubed for gamma correction
-    Vec3 new_color = record.material.colour * brightness +
-                     light_colour * brightness * brightness * brightness;
-
-    return new_color;
   }
-
-  return background;
+  // std::clog << "incoming_light is " << incoming_light << '\n';
+  return incoming_light;
 }
